@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Gen X Character Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2rem; }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      [hidden] { display: none !important; }
+
+      :root {
+        --bg: #dde2d6;
+        --bg-deep: #ccd4c0;
+        --panel: #f7f3e8;
+        --panel-edge: #d8cfb8;
+        --ink: #28221a;
+        --ink-soft: #5c5546;
+        --accent: #bc4a17;
+        --accent-ink: #ffffff;
+        --teal: #27665f;
+        --gold: #c99327;
+        --wood: #7c5636;
+        --wood-dark: #5d3f24;
+        --card: #fbf7ec;
+        --card-band: #33302a;
+        --card-band-ink: #f3e9d2;
+        --rule: rgba(124, 86, 54, 0.16);
+        --flag-bg: #fbe9e2;
+        --flag-ink: #8f3410;
+        --flag-edge: #e5b49e;
+        --chip-bg: #ece4cf;
+        --chip-ink: #4c4433;
+        --shadow: 0 10px 30px rgba(43, 34, 20, 0.18);
+        --btn-ghost-bg: #efe9d8;
+        --prompt-bg: #262019;
+        --prompt-ink: #f0e6cf;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16120e;
+          --bg-deep: #100d0a;
+          --panel: #241c14;
+          --panel-edge: #453723;
+          --ink: #f0e7d3;
+          --ink-soft: #b8ab90;
+          --accent: #e8763a;
+          --accent-ink: #1d130a;
+          --teal: #5db3a6;
+          --gold: #dfae4a;
+          --wood: #a97c4e;
+          --wood-dark: #c49a63;
+          --card: #2a2115;
+          --card-band: #171310;
+          --card-band-ink: #f3e9d2;
+          --rule: rgba(223, 174, 74, 0.14);
+          --flag-bg: #3d2015;
+          --flag-ink: #f0b294;
+          --flag-edge: #6e3a22;
+          --chip-bg: #372b1a;
+          --chip-ink: #e3d5b2;
+          --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          --btn-ghost-bg: #32281a;
+          --prompt-bg: #0f0c09;
+          --prompt-ink: #f0e6cf;
+        }
+      }
+
+      body {
+        margin: 0;
+        font-family: "Archivo", system-ui, sans-serif;
+        background:
+          radial-gradient(1200px 500px at 85% -10%, var(--bg-deep), transparent 60%),
+          var(--bg);
+        color: var(--ink);
+        line-height: 1.5;
+      }
+      .wrap { max-width: 880px; margin: 0 auto; padding: 20px 16px 48px; }
+
+      header.hero { padding: 14px 0 6px; }
+      .hero h1 {
+        font-family: "Archivo Black", "Archivo", sans-serif;
+        font-size: clamp(1.7rem, 6vw, 2.6rem);
+        line-height: 1.05;
+        margin: 0 0 8px;
+        letter-spacing: 0.01em;
+      }
+      .hero h1 .x { color: var(--accent); }
+      .hero p { margin: 0; max-width: 62ch; color: var(--ink-soft); font-size: 1rem; }
+      .hero p strong { color: var(--ink); }
+
+      section.panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-edge);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+        margin-top: 22px;
+      }
+      .step-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+      .step-num {
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 600;
+        font-size: 0.8rem;
+        background: var(--card-band);
+        color: var(--card-band-ink);
+        border-radius: 4px;
+        padding: 3px 8px;
+        letter-spacing: 0.08em;
+      }
+      .step-head h2 { font-size: 1.15rem; margin: 0; font-weight: 700; }
+      .step-head .note { color: var(--ink-soft); font-size: 0.88rem; margin-left: auto; }
+
+      textarea#profileInput {
+        width: 100%;
+        min-height: 300px;
+        resize: vertical;
+        border: 1px solid var(--panel-edge);
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--ink);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.55;
+        padding: 12px 14px;
+      }
+      textarea#profileInput:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+      textarea#profileInput::placeholder { color: var(--ink-soft); opacity: 0.75; }
+
+      .input-hint { margin: 10px 0 0; font-size: 0.86rem; color: var(--ink-soft); }
+      .input-hint strong { color: var(--ink); font-weight: 600; }
+
+      /* ---------- optional fold-down form ---------- */
+      .alt-form {
+        margin-top: 14px;
+        border: 1px solid var(--panel-edge);
+        border-radius: 8px;
+        background: var(--card);
+      }
+      .alt-form summary {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.95rem;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .alt-form summary::-webkit-details-marker { display: none; }
+      .alt-form summary::before {
+        content: "▸";
+        font-size: 0.85rem;
+        color: var(--accent);
+        transition: transform 0.15s ease;
+      }
+      .alt-form[open ] summary::before { transform: rotate(90deg); }
+      .alt-form summary .alt-form-note { font-weight: 400; color: var(--ink-soft); font-size: 0.85rem; }
+      .alt-form-body { padding: 2px 14px 14px; border-top: 1px dashed var(--panel-edge); }
+      .alt-form-intro { margin: 10px 0 12px; font-size: 0.86rem; color: var(--ink-soft); }
+      .form-row { display: grid; gap: 10px; margin-bottom: 10px; }
+      .form-row-3 { grid-template-columns: 1.4fr 0.6fr 1fr; }
+      .form-field { display: block; margin-bottom: 10px; }
+      .form-field:last-child { margin-bottom: 0; }
+      .alt-form label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--ink);
+        display: block;
+      }
+      .alt-form label span.opt { font-weight: 400; color: var(--ink-soft); }
+      .alt-form input[type="text"],
+      .alt-form textarea {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
+        border: 1px solid var(--panel-edge);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--ink);
+        font-family: "Archivo", sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        padding: 8px 10px;
+      }
+      .alt-form textarea { resize: vertical; font-family: "IBM Plex Mono", monospace; font-size: 0.84rem; }
+      .alt-form input[type="text"]:focus,
+      .alt-form textarea:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+      @media (max-width: 640px) {
+        .form-row-3 { grid-template-columns: 1fr 1fr; }
+        .form-row-3 label:last-child { grid-column: 1 / -1; }
+      }
+      .input-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+      .char-count { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-soft); }
+
+      button {
+        font-family: "Archivo", sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 8px 16px;
+        cursor: pointer;
+        min-height: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+      }
+      button:active { transform: translateY(1px); }
+      button:disabled { opacity: 0.55; cursor: wait; }
+      .btn-primary { background: var(--accent); color: var(--accent-ink); font-size: 1.05rem; padding: 12px 22px; }
+      .btn-primary:hover { filter: brightness(1.07); }
+      .btn-ghost { background: var(--btn-ghost-bg); color: var(--ink); border-color: var(--panel-edge); }
+      .btn-ghost:hover { border-color: var(--wood); }
+      .btn-teal { background: var(--teal); color: #fff; }
+      @media (prefers-color-scheme: dark) { .btn-teal { color: #0d1512; } }
+      .generate-row { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+      .generate-row .btn-primary { flex: 1 1 240px; }
+
+      /* ---------- empty state ---------- */
+      .empty-state {
+        margin-top: 22px;
+        border: 2px dashed var(--panel-edge);
+        border-radius: 12px;
+        padding: 36px 20px;
+        text-align: center;
+        color: var(--ink-soft);
+        background: var(--panel);
+      }
+      .empty-state .es-title {
+        font-family: "Archivo Black", "Archivo", sans-serif;
+        font-size: 1.25rem;
+        color: var(--ink);
+        margin: 0 0 8px;
+      }
+      .empty-state p { margin: 0 auto; max-width: 52ch; }
+      .empty-state strong { color: var(--ink); }
+
+      /* ---------- trait chips ---------- */
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 2px 0; align-items: center; }
+      .chips .chips-label { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-soft); letter-spacing: 0.04em; }
+      .chip {
+        background: var(--chip-bg); color: var(--chip-ink);
+        border-radius: 999px; padding: 4px 12px;
+        font-size: 0.82rem; font-weight: 600;
+      }
+
+      /* ---------- character card ---------- */
+      .char-card {
+        margin-top: 14px;
+        background:
+          repeating-linear-gradient(to bottom, transparent 0 27px, var(--rule) 27px 28px),
+          var(--card);
+        border: 2px solid var(--wood-dark);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .card-band {
+        background: var(--card-band);
+        color: var(--card-band-ink);
+        padding: 16px 20px 14px;
+        display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline;
+        border-bottom: 4px solid var(--gold);
+      }
+      .card-band .cname { font-family: "Archivo Black", sans-serif; font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1; }
+      .card-band .cmeta { font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; opacity: 0.9; }
+      .card-band .cclass { width: 100%; font-family: "IBM Plex Mono", monospace; font-size: 0.92rem; color: var(--gold); letter-spacing: 0.02em; }
+
+      .card-top { display: grid; grid-template-columns: 300px 1fr; gap: 0; }
+      .figure { padding: 16px 0 16px 16px; }
+      .figure svg { width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--panel-edge); }
+      .figure .caption { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--ink-soft); margin-top: 6px; text-align: center; }
+
+      .stats { padding: 16px 18px 8px; }
+      .stats h3, .card-fields h3 {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--wood-dark); margin: 0 0 10px;
+      }
+      .stat { display: grid; grid-template-columns: 122px 1fr 46px; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.86rem; }
+      .stat .sname { font-weight: 600; }
+      .stat .sbar { height: 10px; border-radius: 5px; background: var(--chip-bg); overflow: hidden; }
+      .stat .sfill { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--gold), var(--accent)); }
+      .stat .sfill.low { background: var(--teal); }
+      .stat .sval { font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; text-align: right; }
+
+      .card-fields { padding: 6px 20px 20px; }
+      .field { padding: 10px 0 2px; border-top: 1px dashed var(--panel-edge); }
+      .field:first-of-type { border-top: none; }
+      .field h3 { margin-bottom: 4px; }
+      .field p { margin: 0 0 8px; font-size: 0.97rem; }
+      .field ul { margin: 0 0 8px; padding-left: 20px; }
+      .field li { margin-bottom: 3px; font-size: 0.97rem; }
+      .catchphrase {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 1.08rem; font-weight: 600;
+      }
+      .flag-box {
+        background: var(--flag-bg); color: var(--flag-ink);
+        border: 1px solid var(--flag-edge); border-radius: 8px;
+        padding: 10px 14px; margin-bottom: 10px;
+      }
+      .flag-box p { margin: 0; font-size: 0.95rem; }
+
+      .card-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+      .card-actions button { flex: 1 1 200px; }
+
+      /* ---------- prompt ---------- */
+      .prompt-box {
+        background: var(--prompt-bg); color: var(--prompt-ink);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.9rem; line-height: 1.65;
+        border-radius: 8px; padding: 16px;
+        white-space: pre-wrap; word-break: break-word;
+        max-height: 340px; overflow-y: auto;
+      }
+      .prompt-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+      .prompt-actions button { flex: 1 1 200px; }
+      .hint { color: var(--ink-soft); font-size: 0.9rem; margin: 0 0 12px; }
+
+
+      footer { margin-top: 34px; text-align: center; color: var(--ink-soft); font-size: 0.88rem; }
+      footer a { color: var(--teal); font-weight: 600; }
+      footer .foot-note { display: block; margin-top: 6px; font-size: 0.8rem; }
+
+      .toast {
+        position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px);
+        background: var(--card-band); color: var(--card-band-ink);
+        padding: 10px 20px; border-radius: 999px; font-weight: 600; font-size: 0.92rem;
+        opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease;
+        z-index: 50; box-shadow: var(--shadow);
+        max-width: calc(100vw - 32px); text-align: center;
+      }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      @media (prefers-reduced-motion: reduce) {
+        .toast { transition: none; } button:active { transform: none; }
+      }
+
+      @media (max-width: 640px) {
+        .stats { padding: 14px 16px 4px; }
+        .card-fields { padding: 4px 16px 16px; }
+        .stat { grid-template-columns: 104px 1fr 46px; }
+        .card-top { grid-template-columns: 1fr; }
+        .figure { padding: 14px 14px 0; }
+        section.panel { padding: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <h1>Gen <span class="x">X</span> Character Creator</h1>
+        <p>Feed it an anti-dating profile, get back a fully statted Gen X character — <strong>character card</strong> for the fridge door and a paste-ready <strong>image prompt</strong> for your generator of choice. Raised by a wood-paneled basement and a blinking VCR clock.</p>
+      </header>
+
+      <section class="panel" aria-labelledby="inputHead">
+        <div class="step-head">
+          <span class="step-num">STEP 1</span>
+          <h2 id="inputHead">The anti-profile</h2>
+          <span class="note">Starts blank. Paste yours in and hit Generate.</span>
+        </div>
+        <textarea id="profileInput" aria-label="Dating profile text" placeholder="Paste your anti-dating profile here...
+
+Name, age — city
+About me: ...
+What I'm looking for: ...
+Red flags: ...
+Dealbreakers: ...
+Ideal first date: ...
+Swipe right if: ..."></textarea>
+        <p class="input-hint">For best results, include: <strong>Nickname or Name</strong> · <strong>Age</strong> · <strong>City</strong> (optional) — the first line works best as <em>Name, 47 — City</em>.</p>
+
+        <details class="alt-form" id="altForm">
+          <summary>Or fill out the form instead <span class="alt-form-note">— optional, answer what you want</span></summary>
+          <div class="alt-form-body">
+            <p class="alt-form-intro">Filling this in builds your profile text in the box above. You can still edit it there before you hit Generate.</p>
+            <div class="form-row form-row-3">
+              <label>Nickname or Name
+                <input type="text" id="fName" autocomplete="off" placeholder="e.g. Wick" />
+              </label>
+              <label>Age
+                <input type="text" id="fAge" inputmode="numeric" autocomplete="off" placeholder="47" />
+              </label>
+              <label>City <span class="opt">(optional)</span>
+                <input type="text" id="fCity" autocomplete="off" placeholder="Portland" />
+              </label>
+            </div>
+            <label class="form-field">About me
+              <textarea id="fAbout" rows="2" placeholder="What you do, what you're into, how you spend a Saturday…"></textarea>
+            </label>
+            <label class="form-field">What you're looking for
+              <textarea id="fLooking" rows="2" placeholder="Or not looking for. Be honest."></textarea>
+            </label>
+            <label class="form-field">Red flags
+              <textarea id="fRedFlags" rows="2" placeholder="Yours, theirs, everyone's."></textarea>
+            </label>
+            <label class="form-field">Dealbreakers
+              <textarea id="fDealbreakers" rows="2" placeholder="The hard no list."></textarea>
+            </label>
+            <label class="form-field">Ideal first date
+              <textarea id="fFirstDate" rows="2" placeholder="Low-key counts. So does a farmers market in the rain."></textarea>
+            </label>
+          </div>
+        </details>
+
+        <div class="input-row">
+          <span class="char-count" id="charCount"></span>
+          <span style="flex:1"></span>
+          <button type="button" class="btn-ghost" id="clearBtn">Clear</button>
+        </div>
+        <div class="generate-row">
+          <button type="button" class="btn-primary" id="generateBtn">⚄&ensp;Generate my character</button>
+        </div>
+      </section>
+
+      <div class="empty-state" id="emptyState">
+        <p class="es-title">No character yet</p>
+        <p>Paste an anti-dating profile above and hit <strong>Generate my character</strong>. Out comes a character card and a paste-ready image prompt for your Gen X alter ego.</p>
+      </div>
+
+      <div id="results" hidden>
+        <div class="chips" id="traitChips" aria-live="polite"></div>
+
+        <section aria-labelledby="cardHead">
+          <h2 id="cardHead" style="position:absolute;left:-9999px;">Character card</h2>
+          <div class="char-card" id="charCard"></div>
+          <div class="card-actions">
+            <button type="button" class="btn-ghost" id="randomizeBtn">↻&ensp;Randomize the flavor</button>
+            <button type="button" class="btn-teal" id="copyCardBtn">⧉&ensp;Copy card text</button>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="promptHead">
+          <div class="step-head">
+            <span class="step-num">STEP 2</span>
+            <h2 id="promptHead">The image prompt</h2>
+          </div>
+          <p class="hint">Paste-ready: subject first, natural prose, real camera and film details, no tag soup. Drop it into NightCafé or your generator of choice.</p>
+          <div class="prompt-box" id="promptText" tabindex="0"></div>
+          <div class="prompt-actions">
+            <button type="button" class="btn-teal" id="copyPromptBtn">⧉&ensp;Copy image prompt</button>
+          </div>
+        </section>
+</div>
+
+      <footer>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=ZFLH64VHD6S46" target="_blank" rel="noopener">Tip jar — thanks for keeping the basement lights on</a>
+        <span class="foot-note">No profiles were harmed in the making of this character.</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var input = document.getElementById("profileInput");
+        var charCount = document.getElementById("charCount");
+        var chipsEl = document.getElementById("traitChips");
+        var cardEl = document.getElementById("charCard");
+        var promptEl = document.getElementById("promptText");
+        var toastEl = document.getElementById("toast");
+        var emptyStateEl = document.getElementById("emptyState");
+        var resultsEl = document.getElementById("results");
+
+        /* ---------------- trait detection ---------------- */
+        var TRAITS = [
+          { key: "lasers",    test: /laser/i, chip: "Laser work",
+            trait: "Makes things with lasers. Your name is already engraved on something you did not ask for.",
+            item: "a laser cutter that gets used more than the stove",
+            stat: ["Laser Proficiency", 10] },
+          { key: "discgolf",  test: /disc golf/i, chip: "Disc golf",
+            trait: "Will talk about disc golf. A lot. There will be charts.",
+            item: "a disc bag heavier than a weekender",
+            stat: ["Disc Golf Monologue", 10] },
+          { key: "cat",       test: /\bcat\b/i, chip: "Cat staff",
+            trait: "Employed full-time by a cat who owns the house. The cat is correct about this.",
+            item: "a cat who owns the house and everyone in it",
+            stat: ["Cat Servitude", 9] },
+          { key: "kid",       test: /\bkid\b|\bson\b|\bdaughter\b|child/i, chip: "Parent mode",
+            trait: "Has a kid running the household schedule. Snacks packed, screen-time limits enforced selectively, mostly by the kid.",
+            item: "a juice box in every jacket pocket, just in case",
+            stat: ["Parent Energy", 8] },
+          { key: "earlybed",  test: /bed early|early to bed|in bed by/i, chip: "Early bedtime",
+            trait: "Goes to bed early and likes it that way. This is not a flaw. This is the whole personality and it is load-bearing.",
+            item: "an alarm clock set for an hour most people call the middle of the night",
+            stat: ["Bedtime Discipline", 10] },
+          { key: "neuro",     test: /neurospicy|neurodivergent|hyperfocus/i, chip: "Neurospicy",
+            trait: "Hyperfocuses on you for three weeks, then disappears into a brand-new obsession. It is not personal.",
+            item: "seventeen open browser tabs and one all-consuming new hobby",
+            stat: ["Hyperfocus", 9] },
+          { key: "mushrooms", test: /mushroom|forag/i, chip: "Mushroom arc",
+            trait: "Currently in a mushroom phase. Will stop mid-walk to photograph fungi and explain them.",
+            item: "a field guide with the good pages dog-eared",
+            stat: ["Foraging", 7] },
+          { key: "market",    test: /farmers market/i, chip: "Farmers market",
+            trait: "Ideal first date is a farmers market in the rain. A pastry will be purchased. This is a promise and a threat.",
+            item: "a canvas tote and strong opinions about sourdough",
+            stat: ["Pastry Diplomacy", 8] },
+          { key: "coaster",   test: /coaster/i, chip: "Coaster love language",
+            trait: "Love language: \u201CI made you a coaster.\u201D Resistance is futile. Your name is on it.",
+            item: "a stack of personalized coasters nobody requested",
+            stat: ["Coaster Output", 10] },
+          { key: "texting",   test: /text (you )?back|text all day|texting/i, chip: "Slow texter",
+            trait: "Will text back when they are done. They are rarely done, but the text, when it comes, is quality.",
+            item: "a phone that is mostly used as a flashlight",
+            stat: ["Texting Speed", 2] },
+          { key: "business",  test: /business|shop|etsy/i, chip: "Small business",
+            trait: "Runs a small business out of sheer spite and sawdust. Everything is a write-off if you believe.",
+            item: "a receipt folder labeled TAXES?? in pencil",
+            stat: ["Hustle", 8] },
+          { key: "sarcasm",   test: /sarcasm/i, chip: "Sarcasm-free zone",
+            trait: "\u201CFluent in sarcasm\u201D is a dealbreaker. We are not doing that. Says what they mean, in full sentences.",
+            item: "a complete absence of patience for bio clichés",
+            stat: ["Straight Talk", 9] }
+        ];
+
+        var CLASSES = {
+          lasers: "Laser Wizard", discgolf: "Disc Slinger", cat: "Cat Butler",
+          kid: "Weekend Paladin", earlybed: "Dawn Patrol Cleric", neuro: "Chaos Archivist",
+          mushrooms: "Forest Forager", market: "Pastry Diplomat", coaster: "Coaster Artificer",
+          texting: "Reluctant Correspondent", business: "Sawdust Merchant", sarcasm: "Plain-Speech Bard"
+        };
+
+        var LOOKS = [
+          "Flannel shirt over a faded band tee, jeans worn soft at the knees, hair doing whatever it wants and winning",
+          "Denim jacket over a concert tee, Walkman clipped to the belt — one headphone in, one out, so they can hear you and the bassline",
+          "Oversized flannel, corduroys, scuffed skate shoes, wallet chain worn without a trace of irony",
+          "Thrift-store leather jacket, plain white tee, jeans cuffed over boots that have seen things",
+          "Windbreaker in a color not found in nature, high-top sneakers, fanny pack worn proudly and without apology",
+          "Hoodie under a flannel, ball cap on backwards, cargo shorts with pockets that all have jobs"
+        ];
+
+        var ERA_ITEMS = [
+          "a Walkman with foam headphones and a tape that sticks at the good part",
+          "a mixtape labeled in ballpoint pen, track list on the insert in tiny handwriting",
+          "a stack of VHS rentals due back Tuesday, rewind fees looming",
+          "a BMX leaned against the garage door, pegs and all",
+          "a skateboard with a chipped tail and stickers from bands that broke up in 1994",
+          "a boombox that eats D batteries like they owe it money",
+          "a CRT TV with a VCR blinking 12:00 since the Carter administration",
+          "a Trapper Keeper with a very serious airbrushed design on it",
+          "a corded phone with a cord long enough to reach the pantry",
+          "a can of something fizzy sweating on the basement fridge"
+        ];
+
+        var CATCHPHRASES = [
+          "I\u2019m not looking for anything. Anyway — sit down.",
+          "I\u2019ll text you back when I\u2019m done.",
+          "Bed by ten. This is non-negotiable.",
+          "Be kind. Rewind.",
+          "Whatever. And I mean that sincerely.",
+          "Raised by a television. Turned out fine.",
+          "If the streetlights are on, I\u2019m already home."
+        ];
+
+        var FALLBACK_TITLES = [
+          "Unnamed Latchkey Kid",
+          "Mystery Mixtape Maker",
+          "The Kid From the Basement",
+          "Unknown VHS Rewinder",
+          "Professional Channel Surfer",
+          "Champion of the Wood Paneling",
+          "The One Who Rewinds",
+          "Last Kid on the Block"
+        ];
+
+        /* generic Gen X traits used to guarantee at least two traits on the card */
+        var FALLBACK_TRAITS = [
+          { key: "fb-mixtape", chip: "Mixtape archivist",
+            trait: "Keeps a shoebox of mixtapes, each labeled in ballpoint pen, each one a small emotional hostage situation.",
+            item: "a shoebox of mixtapes with the good songs labeled in ballpoint pen",
+            stat: ["Mixtape Game", 9] },
+          { key: "fb-flannel", chip: "Flannel devotee",
+            trait: "Owns a flannel for every day of the week and two for Sunday. Weather is a suggestion; flannel is a constant.",
+            item: "a flannel for every day of the week, plus two for Sunday",
+            stat: ["Flannel Level", 10] },
+          { key: "fb-latchkey", chip: "Latchkey veteran",
+            trait: "Let themselves in after school from age nine and ran the house like a small, snack-based nation until a parent got home.",
+            item: "a house key on a shoelace, worn like a medal",
+            stat: ["Latchkey Survival", 10] },
+          { key: "fb-rewind", chip: "Rewind royalty",
+            trait: "Rewinds out of pure courtesy, even now, even when there is nothing to rewind. Some values are load-bearing.",
+            item: "a VCR that has never once blinked 12:00 (a proud lie)",
+            stat: ["Rewind Speed", 9] },
+          { key: "fb-surfer", chip: "Channel surfer",
+            trait: "Can surf 60 channels in under a minute and land on the one watchable thing by instinct alone.",
+            item: "a remote control with the buttons worn smooth",
+            stat: ["Channel Surfing", 8] },
+          { key: "fb-arcade", chip: "Arcade regular",
+            trait: "Still keeps quarters in a dedicated pocket, just in case a cabinet appears. It has happened before. It will happen again.",
+            item: "a pocket organized by quarter denomination",
+            stat: ["Quarter Hoarding", 8] }
+        ];
+
+        /* extra stat bars, rolled fresh on every generate / randomize */
+        var FLAVOR_STATS = [
+          ["Mixtape Game", 6, 10],
+          ["Flannel Level", 7, 10],
+          ["Sarcasm Shield", 3, 9],
+          ["Latchkey Survival", 8, 10],
+          ["Rewind Speed", 5, 10],
+          ["TV Guide Recall", 6, 10],
+          ["Snack Procurement", 7, 10],
+          ["Small Talk Endurance", 1, 4],
+          ["Quarter Hoarding", 4, 9],
+          ["Streetlight Compliance", 6, 10]
+        ];
+
+        var CAMERAS = [
+          "shot on a Canon AE-1 Program with a 50mm f/1.8 lens on Kodak Gold 200 film, with direct on-camera flash and a warm, slightly faded color cast",
+          "shot on a Pentax K1000 with a 35mm lens on Fujicolor 200 film, lit by the amber glow of a basement lamp and the blue flicker of a CRT television",
+          "shot on a Nikon FM2 with a 50mm f/1.4 lens on Kodak Portra 400 film, shallow depth of field, soft window light through basement blinds",
+          "shot on a point-and-shoot film camera on Kodak Gold 200, hard flash, red-eye and all, the way every good memory from 1991 actually looks",
+          "shot on a Minolta X-700 with a 45mm lens on expired Fujifilm 400, grainy and warm, colors leaning green in the shadows"
+        ];
+
+        var SCENES = [
+          "a wood-paneled basement rec room in the fall of 1991",
+          "a wood-paneled basement rec room in the fall of 1989, rain ticking against the small high windows",
+          "a garage converted into a hangout spot in the spring of 1992, door half open to a wet driveway",
+          "a wood-paneled basement rec room in the winter of 1990, space heater glowing in the corner"
+        ];
+
+        /* ---------------- helpers ---------------- */
+        function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function roll(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
+        function weightedPick(list) {
+          var total = 0, i, r;
+          for (i = 0; i < list.length; i++) total += list[i].w;
+          r = Math.random() * total;
+          for (i = 0; i < list.length; i++) { r -= list[i].w; if (r <= 0) return list[i].id; }
+          return list[list.length - 1].id;
+        }
+        function pickN(arr, n) {
+          var copy = arr.slice(), out = [];
+          while (copy.length && out.length < n) out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+          return out;
+        }
+        function esc(s) {
+          return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        function section(text, label) {
+          var labels = ["About me", "What I\u2019m looking for", "What I'm looking for", "Red flags", "Dealbreakers", "Ideal first date", "Swipe right if"];
+          var idx = text.toLowerCase().indexOf(label.toLowerCase() + ":");
+          if (idx < 0) return "";
+          var rest = text.slice(idx + label.length + 1);
+          var end = rest.length;
+          labels.forEach(function (l) {
+            var j = rest.toLowerCase().indexOf("\n" + l.toLowerCase() + ":");
+            if (j >= 0 && j < end) end = j;
+          });
+          return rest.slice(0, end).trim();
+        }
+
+        function parseProfile(text) {
+          var p = { name: "", age: "", city: "", traits: [], redFlags: "", firstDate: "" };
+          var firstLine = (text.split("\n")[0] || "").trim();
+          var m = firstLine.match(/^([^,]+),\s*(\d+)\s*[—–-]\s*(.+)$/);
+          if (m) { p.name = m[1].trim(); p.age = m[2].trim(); p.city = m[3].trim(); }
+          else {
+            var m2 = firstLine.match(/^([^,]+),\s*(\d+)\s*$/);
+            if (m2) { p.name = m2[1].trim(); p.age = m2[2].trim(); }
+            else {
+              var m3 = firstLine.match(/^(.+?)\s*[—–-]\s*(.+)$/);
+              if (m3 && /^\d+$/.test(m3[1].trim())) { p.age = m3[1].trim(); p.city = m3[2].trim(); }
+              else if (m3 && firstLine.indexOf(":") < 0 && firstLine.length <= 60) { p.name = m3[1].trim(); p.city = m3[2].trim(); }
+              else if (firstLine && firstLine.indexOf(":") < 0 && firstLine.length <= 40) { p.name = firstLine; }
+            }
+          }
+          TRAITS.forEach(function (t) { if (t.test.test(text)) p.traits.push(t); });
+          p.redFlags = section(text, "Red flags");
+          p.firstDate = section(text, "Ideal first date");
+          return p;
+        }
+        function metaLine(p) {
+          var parts = [];
+          if (p.age) parts.push("Level " + p.age);
+          if (p.city) parts.push(p.city);
+          parts.push("Gen X");
+          return parts.join(" · ");
+        }
+
+        /* ---------------- generation ---------------- */
+        var current = null; // {parsed, flavor, cardText, promptText}
+
+        function rollFlavor(p) {
+          var items = [];
+          p.traits.forEach(function (t) { if (t.item) items.push(t.item); });
+          items = items.slice(0, 3).concat(pickN(ERA_ITEMS, 3));
+          var classParts = [];
+          p.traits.forEach(function (t) { if (CLASSES[t.key] && classParts.length < 2) classParts.push(CLASSES[t.key]); });
+          if (!classParts.length) classParts.push("Basement Archivist");
+          if (classParts.length < 2) classParts.push("Mixtape Curator");
+          var flavorStats = pickN(FLAVOR_STATS, 6).map(function (s) { return [s[0], roll(s[1], s[2])]; });
+          return {
+            displayName: p.name || pick(FALLBACK_TITLES),
+            flavorStats: flavorStats,
+            avatar: rollAvatar(p),
+            look: pick(LOOKS),
+            items: items,
+            catchphrase: pick(CATCHPHRASES),
+            camera: pick(CAMERAS),
+            scene: pick(SCENES),
+            charClass: classParts.join(" / "),
+            seedLine: pick([
+              "Raised on Saturday-morning cartoons, radio-dubbed mixtapes with the DJ talking over the intro, and a basement that smelled faintly of old carpet and possibility.",
+              "Came of age rewinding VHS tapes out of pure courtesy, memorizing the TV Guide channel, and riding a BMX home before the streetlights came on.",
+              "Formative years spent in a wood-paneled basement: CRT glow, boombox on the carpet, and a skateboard by the door for a fast exit from family gatherings.",
+              "Grew up on landline phones with cords long enough to pace, three TV channels that signed off at night, and the sacred ritual of the Friday video rental run."
+            ])
+          };
+        }
+
+        function buildBackstory(p, f) {
+          var s = (f.displayName || p.name || "This character") + " — a late-eighties kid and early-nineties young adult";
+          if (p.age) s += ", now level " + p.age;
+          if (p.city) s += " and based in " + p.city;
+          s += ". " + f.seedLine + " ";
+          var bits = [];
+          if (has(p, "lasers")) bits.push("these days the basement workshop runs a laser cutter, and if you stand still long enough your name gets engraved on something");
+          if (has(p, "discgolf")) bits.push("weekends are for throwing discs at baskets in the woods and explaining, with charts, why the home course is unfair");
+          if (has(p, "cat") && has(p, "kid")) bits.push("home life is shared with a kid co-conspirator and a cat who owns the house outright");
+          else if (has(p, "cat")) bits.push("home life is shared with a cat who owns the house; everyone else is staff");
+          else if (has(p, "kid")) bits.push("home life revolves around a kid co-conspirator and a strict snack economy");
+          if (has(p, "mushrooms")) bits.push("a recent mushroom phase means stopping mid-walk to photograph fungi like they owe money");
+          if (has(p, "market")) bits.push("their idea of romance is a farmers market in the rain and a pastry, purchased without hesitation");
+          if (has(p, "earlybed")) bits.push("bedtime comes early, is defended like a thesis, and lands before your favorite show starts");
+          if (!bits.length) bits.push("they contain multitudes, most of them involving snacks and strong opinions about parking");
+          s += "Now: " + bits.join("; ") + ". ";
+          s += "They insist they are not looking for anything. The evidence suggests someone who is, in fact, extremely findable.";
+          return s;
+        }
+        function has(p, key) { return p.traits.some(function (t) { return t.key === key; }); }
+
+        function buildPrompt(p, f) {
+          var bits = [];
+          bits.push("A candid photograph of a Gen X adult in their element in " + f.scene);
+          bits.push("they wear " + f.look.charAt(0).toLowerCase() + f.look.slice(1));
+          var sceneItems = [];
+          if (has(p, "discgolf")) sceneItems.push("a disc golf disc resting on the arm of the couch beside them");
+          if (has(p, "cat")) sceneItems.push("a self-satisfied cat sitting on the back of the couch like it pays the mortgage");
+          if (has(p, "lasers")) sceneItems.push("a small stack of freshly laser-engraved wooden coasters on the coffee table");
+          if (has(p, "mushrooms")) sceneItems.push("a mushroom field guide open on the carpet next to a pair of muddy boots");
+          if (has(p, "kid")) sceneItems.push("a kid\u2019s backpack and a juice box abandoned mid-adventure by the stairs");
+          sceneItems.push("a boombox on the carpet");
+          sceneItems.push("a stack of VHS tapes and a CRT television playing static-bright late-night TV behind them");
+          bits.push("around them: " + sceneItems.join(", "));
+          bits.push("they are mid-laugh at something off camera, completely unbothered, radiating the energy of someone who insists they are not looking for anything");
+          bits.push(f.camera);
+          bits.push("warm, affectionate, gently satirical mood, like a family photo that turned out better than anyone expected");
+          return bits.join(", ") + ".";
+        }
+
+
+        /* ---------------- stats ----------------
+           Hard cap: the card never shows more than 8 stat bars. */
+        function buildStats(p, f) {
+          var out = [];
+          p.traits.forEach(function (t) { if (t.stat && out.length < 5) out.push(t.stat); });
+          var i = 0;
+          while (out.length < 8 && i < f.flavorStats.length) { out.push(f.flavorStats[i]); i++; }
+          if (!out.length) out = [["Vibes", 8], ["Bedtime Discipline", 10]];
+          return out.slice(0, 8);
+        }
+
+        /* ---------------- procedural portrait ----------------
+           Assembled in-browser from parts: background, hair, outfit, face,
+           and one prop. The prop is picked at random but weighted toward
+           whatever the profile actually mentions. */
+        function rollAvatar(p) {
+          var props = [
+            { id: "boombox", w: 3 }, { id: "walkman", w: 3 },
+            { id: "vhs", w: 2 }, { id: "skateboard", w: 2 }
+          ];
+          if (has(p, "discgolf")) props.push({ id: "disc", w: 9 });
+          if (has(p, "cat")) props.push({ id: "cat", w: 9 });
+          if (has(p, "lasers") || has(p, "coaster")) props.push({ id: "coaster", w: 8 });
+          if (has(p, "mushrooms")) props.push({ id: "basket", w: 8 });
+          if (has(p, "market")) props.push({ id: "tote", w: 7 });
+          if (has(p, "earlybed")) props.push({ id: "clock", w: 7 });
+          if (has(p, "kid")) props.push({ id: "juicebox", w: 7 });
+          return {
+            bg: pick(["panel", "sunset", "blinds", "teal"]),
+            skin: pick(["#f2c9a0", "#e5b184", "#c6885a", "#9c6642", "#7a4b2a", "#5d3820"]),
+            hairStyle: pick(["feathered", "mullet", "buzz", "long", "curly", "cap", "sidepart"]),
+            hairColor: pick(["#33241a", "#5d3f24", "#8a6238", "#c9a86a", "#1f1c18", "#a34a24", "#8f8a80"]),
+            capColor: pick(["#bc4a17", "#27665f", "#c99327", "#33302a"]),
+            outfit: pick(["flannel", "bandtee", "denim", "windbreaker", "hoodie"]),
+            outfitColor: pick(["#a33327", "#27665f", "#31517d", "#7a4a2b", "#4c5546", "#8f3410"]),
+            accentColor: pick(["#e8763a", "#c99327", "#9fd8d2", "#d1546a", "#e8e2d2"]),
+            expression: pick(["smirk", "grin", "deadpan"]),
+            shades: Math.random() < 0.22,
+            catColor: pick(["#33302a", "#c97b2e", "#8f8a80"]),
+            prop: weightedPick(props)
+          };
+        }
+
+        function avatarSVG(a) {
+          var s = '<svg viewBox="0 0 200 220" role="img" aria-label="Character portrait assembled from parts rolled against the profile details">';
+          /* background */
+          if (a.bg === "panel") {
+            s += '<rect width="200" height="220" fill="#8a6238"/><g stroke="#6f4c27" stroke-width="3"><line x1="34" y1="0" x2="34" y2="220"/><line x1="76" y1="0" x2="76" y2="220"/><line x1="124" y1="0" x2="124" y2="220"/><line x1="166" y1="0" x2="166" y2="220"/></g>';
+          } else if (a.bg === "sunset") {
+            s += '<rect width="200" height="220" fill="#e8b34b"/><rect y="52" width="200" height="34" fill="#e8763a"/><rect y="86" width="200" height="34" fill="#d05a22"/><rect y="120" width="200" height="100" fill="#8f3410"/><circle cx="100" cy="86" r="34" fill="#f3e9d2" opacity="0.85"/>';
+          } else if (a.bg === "blinds") {
+            var bl = "";
+            for (var by = 14; by < 220; by += 14) bl += '<line x1="0" y1="' + by + '" x2="200" y2="' + by + '"/>';
+            s += '<rect width="200" height="220" fill="#d8cfb8"/><g stroke="#b3a888" stroke-width="3">' + bl + '</g>';
+          } else {
+            s += '<rect width="200" height="220" fill="#27665f"/><circle cx="100" cy="104" r="62" fill="#c99327"/><circle cx="100" cy="104" r="62" fill="none" stroke="#f3e9d2" stroke-width="3" stroke-dasharray="6 8"/>';
+          }
+          /* long hair hangs behind everything */
+          if (a.hairStyle === "long") s += '<rect x="56" y="58" width="88" height="114" rx="20" fill="' + a.hairColor + '"/>';
+          if (a.hairStyle === "mullet") s += '<rect x="57" y="72" width="13" height="88" fill="' + a.hairColor + '"/><rect x="130" y="72" width="13" height="88" fill="' + a.hairColor + '"/>';
+          /* torso / outfit */
+          var torso = "M26 220 L38 170 Q44 146 100 146 Q156 146 162 170 L174 220 Z";
+          var base = a.outfit === "bandtee" ? "#33302a" : (a.outfit === "denim" ? "#46688c" : a.outfitColor);
+          s += '<defs><clipPath id="gxTorso"><path d="' + torso + '"/></clipPath></defs>';
+          s += '<path d="' + torso + '" fill="' + base + '"/>';
+          if (a.outfit === "flannel") {
+            s += '<g clip-path="url(#gxTorso)"><g stroke="rgba(255,255,255,0.28)" stroke-width="5"><line x1="58" y1="140" x2="58" y2="220"/><line x1="142" y1="140" x2="142" y2="220"/><line x1="20" y1="182" x2="180" y2="182"/></g><g stroke="rgba(0,0,0,0.22)" stroke-width="5"><line x1="86" y1="140" x2="86" y2="220"/><line x1="114" y1="140" x2="114" y2="220"/><line x1="20" y1="202" x2="180" y2="202"/></g></g>';
+            s += '<path d="M82 146 L100 168 L118 146 L109 142 L100 153 L91 142 Z" fill="rgba(0,0,0,0.25)"/>';
+            s += '<g fill="#e8e2d2"><circle cx="100" cy="178" r="2.2"/><circle cx="100" cy="194" r="2.2"/><circle cx="100" cy="210" r="2.2"/></g>';
+          } else if (a.outfit === "bandtee") {
+            s += '<circle cx="100" cy="190" r="15" fill="none" stroke="#c99327" stroke-width="3"/><path d="M102 178 L93 191 L99 191 L96 202 L108 188 L101 188 Z" fill="#c99327"/>';
+            s += '<path d="M82 146 L100 164 L118 146 L109 142 L100 152 L91 142 Z" fill="rgba(255,255,255,0.14)"/>';
+          } else if (a.outfit === "denim") {
+            s += '<path d="M84 146 L100 170 L116 146" fill="none" stroke="#2c4258" stroke-width="6"/>';
+            s += '<line x1="100" y1="170" x2="100" y2="220" stroke="rgba(0,0,0,0.25)" stroke-width="3"/>';
+            s += '<g fill="none" stroke="#2c4258" stroke-width="3"><rect x="56" y="184" width="22" height="17" rx="2"/><rect x="122" y="184" width="22" height="17" rx="2"/></g>';
+            s += '<g fill="#c9c2b2"><circle cx="100" cy="182" r="2.2"/><circle cx="100" cy="198" r="2.2"/></g>';
+          } else if (a.outfit === "windbreaker") {
+            s += '<g clip-path="url(#gxTorso)"><path d="M24 200 L176 158 L176 178 L24 220 Z" fill="#f3e9d2" opacity="0.85"/></g>';
+            s += '<line x1="100" y1="150" x2="100" y2="220" stroke="rgba(0,0,0,0.3)" stroke-width="3"/>';
+            s += '<path d="M84 146 L100 162 L116 146 L108 143 L100 151 L92 143 Z" fill="rgba(0,0,0,0.2)"/>';
+          } else { /* hoodie */
+            s += '<path d="M72 154 Q100 130 128 154 L128 166 Q100 148 72 166 Z" fill="rgba(0,0,0,0.22)"/>';
+            s += '<rect x="74" y="192" width="52" height="24" rx="5" fill="rgba(0,0,0,0.16)"/>';
+            s += '<path d="M93 152 L90 166 M107 152 L110 166" stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-linecap="round"/>';
+          }
+          /* neck & head */
+          s += '<rect x="89" y="124" width="22" height="26" fill="' + a.skin + '"/>';
+          s += '<ellipse cx="100" cy="140" rx="12" ry="5" fill="rgba(0,0,0,0.15)"/>';
+          s += '<circle cx="65" cy="100" r="6.5" fill="' + a.skin + '"/><circle cx="135" cy="100" r="6.5" fill="' + a.skin + '"/>';
+          s += '<ellipse cx="100" cy="98" rx="34" ry="38" fill="' + a.skin + '"/>';
+          /* hair */
+          var hc = a.hairColor;
+          if (a.hairStyle === "feathered") {
+            s += '<path d="M63 96 Q56 50 100 48 Q144 50 137 96 Q132 66 116 64 Q124 78 108 68 Q96 58 84 70 Q68 66 63 96 Z" fill="' + hc + '"/>';
+          } else if (a.hairStyle === "mullet") {
+            s += '<path d="M64 92 Q62 52 100 50 Q138 52 136 92 Q120 62 100 62 Q80 62 64 92 Z" fill="' + hc + '"/>';
+          } else if (a.hairStyle === "buzz") {
+            s += '<path d="M65 90 Q65 56 100 56 Q135 56 135 90 Q135 70 100 68 Q65 70 65 90 Z" fill="' + hc + '"/>';
+          } else if (a.hairStyle === "long") {
+            s += '<path d="M63 100 Q58 50 100 48 Q142 50 137 100 Q134 64 118 62 Q124 76 106 66 Q92 56 80 68 Q66 64 63 100 Z" fill="' + hc + '"/>';
+            s += '<rect x="59" y="92" width="10" height="62" fill="' + hc + '"/><rect x="131" y="92" width="10" height="62" fill="' + hc + '"/>';
+          } else if (a.hairStyle === "curly") {
+            s += '<g fill="' + hc + '"><circle cx="70" cy="76" r="11"/><circle cx="82" cy="61" r="12"/><circle cx="100" cy="55" r="13"/><circle cx="118" cy="61" r="12"/><circle cx="130" cy="76" r="11"/></g>';
+          } else if (a.hairStyle === "cap") {
+            s += '<rect x="28" y="74" width="38" height="9" rx="4.5" fill="' + a.capColor + '" transform="rotate(-8 66 78)"/>';
+            s += '<path d="M63 88 Q63 52 100 52 Q137 52 137 88 Z" fill="' + a.capColor + '"/>';
+            s += '<rect x="63" y="82" width="74" height="7" fill="rgba(0,0,0,0.18)"/>';
+            s += '<circle cx="100" cy="53" r="3.5" fill="rgba(0,0,0,0.25)"/>';
+          } else { /* sidepart */
+            s += '<path d="M64 94 Q60 52 104 50 Q140 52 136 94 Q128 60 96 62 Q72 64 64 94 Z" fill="' + hc + '"/>';
+          }
+          /* face */
+          if (a.shades) {
+            s += '<g fill="#22201c"><rect x="71" y="91" width="25" height="17" rx="5"/><rect x="104" y="91" width="25" height="17" rx="5"/></g>';
+            s += '<path d="M96 97 L104 97 M71 95 L63 90 M129 95 L137 90" stroke="#22201c" stroke-width="4" fill="none"/>';
+          } else {
+            s += '<path d="M78 88 Q87 84 95 88 M105 88 Q113 84 122 88" stroke="rgba(0,0,0,0.45)" stroke-width="3" fill="none" stroke-linecap="round"/>';
+            s += '<ellipse cx="86" cy="99" rx="3.2" ry="4.4" fill="#262019"/><ellipse cx="114" cy="99" rx="3.2" ry="4.4" fill="#262019"/>';
+          }
+          s += '<path d="M101 104 L97 115 Q100 118 105 116" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+          if (a.expression === "grin") {
+            s += '<path d="M85 123 Q100 140 115 123" stroke="#262019" stroke-width="4" fill="none" stroke-linecap="round"/>';
+          } else if (a.expression === "deadpan") {
+            s += '<line x1="89" y1="128" x2="111" y2="128" stroke="#262019" stroke-width="3.5" stroke-linecap="round"/>';
+          } else {
+            s += '<path d="M88 127 Q103 133 115 123" stroke="#262019" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
+          }
+          /* walkman headphones sit over the hair */
+          if (a.prop === "walkman") {
+            s += '<path d="M63 98 Q63 50 100 50 Q137 50 137 98" stroke="#22201c" stroke-width="7" fill="none"/>';
+            s += '<rect x="56" y="90" width="13" height="24" rx="5" fill="#22201c"/><rect x="131" y="90" width="13" height="24" rx="5" fill="#22201c"/>';
+            s += '<path d="M137 112 Q146 150 152 190" stroke="#22201c" stroke-width="2.5" fill="none"/>';
+            s += '<rect x="140" y="190" width="28" height="20" rx="3" fill="#c9c2b2" stroke="#8f8a80" stroke-width="1.5"/><circle cx="149" cy="200" r="4" fill="#33302a"/><circle cx="159" cy="200" r="4" fill="#33302a"/>';
+          }
+          /* prop */
+          if (a.prop === "boombox") {
+            s += '<g><path d="M14 170 L56 154" stroke="#22201c" stroke-width="3"/><rect x="4" y="170" width="66" height="42" rx="6" fill="#33302a"/><rect x="10" y="176" width="54" height="30" rx="4" fill="#45403a"/><circle cx="24" cy="192" r="9" fill="#22201c"/><circle cx="24" cy="192" r="4" fill="#c9c2b2"/><circle cx="52" cy="192" r="9" fill="#22201c"/><circle cx="52" cy="192" r="4" fill="#c9c2b2"/><rect x="33" y="180" width="10" height="7" fill="#9fd8d2"/></g>';
+          } else if (a.prop === "cat") {
+            s += '<g fill="' + a.catColor + '"><ellipse cx="34" cy="160" rx="16" ry="12"/><circle cx="26" cy="141" r="11"/><path d="M17 135 L15 122 L25 130 Z"/><path d="M30 130 L39 121 L40 134 Z"/></g>';
+            s += '<path d="M48 162 Q62 152 55 138" stroke="' + a.catColor + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
+            s += '<circle cx="22" cy="141" r="1.8" fill="#dfae4a"/><circle cx="30" cy="141" r="1.8" fill="#dfae4a"/>';
+          } else if (a.prop === "disc") {
+            s += '<path d="M156 174 L179 147" stroke="' + a.skin + '" stroke-width="11" stroke-linecap="round"/>';
+            s += '<circle cx="181" cy="144" r="6" fill="' + a.skin + '"/>';
+            s += '<g transform="rotate(-18 186 134)"><ellipse cx="186" cy="134" rx="19" ry="6" fill="#e8763a" stroke="#8f3410" stroke-width="1.5"/></g>';
+          } else if (a.prop === "vhs") {
+            s += '<g transform="rotate(4 162 196)"><rect x="132" y="180" width="62" height="32" rx="3" fill="#22201c"/><rect x="139" y="186" width="48" height="12" rx="2" fill="#e8e2d2"/><line x1="143" y1="192" x2="170" y2="192" stroke="#8f8a80" stroke-width="2"/><circle cx="146" cy="205" r="3.5" fill="#45403a"/><circle cx="180" cy="205" r="3.5" fill="#45403a"/></g>';
+          } else if (a.prop === "skateboard") {
+            s += '<g transform="rotate(-10 100 208)"><rect x="50" y="202" width="100" height="9" rx="4.5" fill="' + a.accentColor + '"/><circle cx="70" cy="214" r="4" fill="#e8e2d2"/><circle cx="130" cy="214" r="4" fill="#e8e2d2"/></g>';
+          } else if (a.prop === "coaster") {
+            s += '<g fill="#c9a86a" stroke="#8a6238" stroke-width="1.5"><ellipse cx="164" cy="196" rx="21" ry="6"/><ellipse cx="164" cy="203" rx="21" ry="6"/><ellipse cx="164" cy="210" rx="21" ry="6"/></g>';
+            s += '<path d="M152 195 q12 -5 24 0" stroke="#8f3410" stroke-width="2" fill="none"/>';
+          } else if (a.prop === "basket") {
+            s += '<g><path d="M18 190 a9 7 0 0 1 18 0 Z" fill="#c99327"/><rect x="25" y="188" width="4" height="6" fill="#e8e2d2"/><path d="M34 188 a8 6 0 0 1 16 0 Z" fill="#bc4a17"/><rect x="40" y="186" width="4" height="6" fill="#e8e2d2"/><path d="M8 190 L52 190 L46 214 L14 214 Z" fill="#8a6238"/><line x1="11" y1="199" x2="49" y2="199" stroke="#6f4c27" stroke-width="3"/></g>';
+          } else if (a.prop === "tote") {
+            s += '<g><path d="M160 168 Q160 150 171 150 Q182 150 182 168" stroke="#8a6238" stroke-width="4" fill="none"/><path d="M150 168 L192 168 L188 214 L154 214 Z" fill="#e8e2d2"/><path d="M162 188 L180 188 M162 198 L180 198" stroke="#bc4a17" stroke-width="3"/></g>';
+          } else if (a.prop === "clock") {
+            s += '<g><circle cx="156" cy="177" r="6" fill="#c99327"/><circle cx="180" cy="177" r="6" fill="#c99327"/><circle cx="168" cy="194" r="19" fill="#e8e2d2" stroke="#33302a" stroke-width="3"/><path d="M168 194 L168 184 M168 194 L176 198" stroke="#33302a" stroke-width="3" stroke-linecap="round"/><path d="M158 210 L154 218 M178 210 L182 218" stroke="#33302a" stroke-width="3" stroke-linecap="round"/></g>';
+          } else if (a.prop === "juicebox") {
+            s += '<g><path d="M28 182 L37 167" stroke="#c9c2b2" stroke-width="3.5" stroke-linecap="round"/><rect x="12" y="182" width="26" height="32" rx="2" fill="#e8763a"/><rect x="12" y="194" width="26" height="8" fill="#f3e9d2"/><circle cx="25" cy="188" r="4" fill="#f3e9d2"/></g>';
+          }
+          s += "</svg>";
+          return s;
+        }
+
+        function render() {
+          var p = current.parsed, f = current.flavor;
+
+          /* chips */
+          var chipsHtml = '<span class="chips-label">TRAITS ON FILE:</span>';
+          if (p.traits.length) {
+            p.traits.forEach(function (t) { chipsHtml += '<span class="chip">' + esc(t.chip) + '</span>'; });
+          } else {
+            chipsHtml += '<span class="chip">Pure Gen X essence, no notes</span>';
+          }
+          chipsEl.innerHTML = chipsHtml;
+
+          /* stats */
+          var statsHtml = buildStats(p, f).map(function (st) {
+            var v = st[1];
+            return '<div class="stat"><span class="sname">' + esc(st[0]) + '</span>' +
+              '<span class="sbar"><span class="sfill' + (v <= 3 ? " low" : "") + '" style="width:' + (v * 10) + '%"></span></span>' +
+              '<span class="sval">' + v + '/10</span></div>';
+          }).join("");
+
+          var traitsHtml = p.traits.length
+            ? "<ul>" + p.traits.slice(0, 6).map(function (t) { return "<li>" + esc(t.trait) + "</li>"; }).join("") + "</ul>"
+            : "<p>Impossible to pin down. A person of mystery, flannel, and snacks.</p>";
+
+          var itemsHtml = "<ul>" + f.items.map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") + "</ul>";
+
+          var redFlags = p.redFlags
+            ? p.redFlags.replace(/\s+/g, " ").slice(0, 340)
+            : "None listed in the profile — which, frankly, is its own red flag. Proceed with Gen X caution.";
+
+          cardEl.innerHTML =
+            '<div class="card-band">' +
+              '<span class="cname">' + esc(f.displayName.toUpperCase()) + '</span>' +
+              '<span class="cmeta">' + esc(metaLine(p)) + '</span>' +
+              '<span class="cclass">Class: ' + esc(f.charClass) + ' · Alignment: Chaotic Tired · Weakness: Small talk</span>' +
+            '</div>' +
+            '<div class="card-top">' +
+              '<div class="figure">' + avatarSVG(f.avatar) + '<div class="caption">CHARACTER PORTRAIT \u2014 ROLLED FROM THE EVIDENCE IN YOUR PROFILE</div></div>' +
+              '<div class="stats"><h3>Stats</h3>' + statsHtml + '</div>' +
+            '</div>' +
+            '<div class="card-fields">' +
+              '<div class="field"><h3>Era Look</h3><p>' + esc(f.look) + '.</p></div>' +
+              '<div class="field"><h3>Signature Items</h3>' + itemsHtml + '</div>' +
+              '<div class="field"><h3>Traits</h3>' + traitsHtml + '</div>' +
+              '<div class="field"><h3>Backstory</h3><p>' + esc(buildBackstory(p, f)) + '</p></div>' +
+              '<div class="field"><h3>Catchphrase</h3><p class="catchphrase">\u201C' + esc(f.catchphrase) + '\u201D</p></div>' +
+              '<div class="field"><h3>Red Flags (Self-Reported)</h3><div class="flag-box"><p>' + esc(redFlags) + '</p></div></div>' +
+            '</div>';
+
+          promptEl.textContent = buildPrompt(p, f);
+          current.cardText = buildCardText(p, f, redFlags);
+          current.promptText = promptEl.textContent;
+        }
+
+        function buildCardText(p, f, redFlags) {
+          var lines = [];
+          lines.push(f.displayName.toUpperCase() + " — " + metaLine(p));
+          lines.push("Class: " + f.charClass + " · Alignment: Chaotic Tired · Weakness: Small talk");
+          lines.push("");
+          lines.push("STATS");
+          buildStats(p, f).forEach(function (st) {
+            lines.push("  " + st[0] + ": " + st[1] + "/10");
+          });
+          lines.push("");
+          lines.push("ERA LOOK: " + f.look + ".");
+          lines.push("");
+          lines.push("SIGNATURE ITEMS:");
+          f.items.forEach(function (i) { lines.push("  - " + i); });
+          lines.push("");
+          lines.push("TRAITS:");
+          if (p.traits.length) {
+            p.traits.slice(0, 6).forEach(function (t) { lines.push("  - " + t.trait); });
+          } else {
+            lines.push("  - Impossible to pin down. A person of mystery, flannel, and snacks.");
+          }
+          lines.push("");
+          lines.push("BACKSTORY: " + buildBackstory(p, f));
+          lines.push("");
+          lines.push("CATCHPHRASE: \u201C" + f.catchphrase + "\u201D");
+          lines.push("");
+          lines.push("RED FLAGS (SELF-REPORTED): " + redFlags);
+          return lines.join("\n");
+        }
+
+        function generate() {
+          if (!input.value.trim()) return false;
+          var p = parseProfile(input.value);
+          /* a character always carries at least two traits — top up with
+             generic Gen X stock when the profile itself is quiet */
+          var fbPool = FALLBACK_TRAITS.slice();
+          while (p.traits.length < 2 && fbPool.length) {
+            p.traits.push(fbPool.splice(Math.floor(Math.random() * fbPool.length), 1)[0]);
+          }
+          current = { parsed: p, flavor: rollFlavor(p) };
+          render();
+          emptyStateEl.hidden = true;
+          resultsEl.hidden = false;
+          return true;
+        }
+
+
+        /* ---------------- copy ---------------- */
+        var toastTimer = null;
+        function showToast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add("show");
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2600);
+        }
+        function copyText(text, msg) {
+          function done() { showToast(msg); }
+          function fallback() {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); done(); }
+            catch (e) { showToast("Copy blocked — long-press the text to copy it"); }
+            document.body.removeChild(ta);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, fallback);
+          } else { fallback(); }
+        }
+
+        /* ---------------- wiring ---------------- */
+        function updateCount() {
+          var n = input.value.length;
+          charCount.textContent = n === 0
+            ? "Nothing here yet — paste a profile to begin"
+            : n + " characters of pure Gen X";
+        }
+        input.addEventListener("input", updateCount);
+
+        /* ---------------- optional fold-down form ----------------
+           Typing in the form composes the profile text into the paste
+           box above, in the exact format Generate already parses.
+           The paste box stays the source of truth — direct pasting
+           and editing there work exactly as before. */
+        var formIds = ["fName", "fAge", "fCity", "fAbout", "fLooking", "fRedFlags", "fDealbreakers", "fFirstDate"];
+        var formEls = {};
+        formIds.forEach(function (id) { formEls[id] = document.getElementById(id); });
+
+        function composeFromForm() {
+          var name = formEls.fName.value.trim();
+          var age = formEls.fAge.value.trim().replace(/[^\d]/g, "");
+          var city = formEls.fCity.value.trim();
+          var lines = [];
+          if (name && age && city) lines.push(name + ", " + age + " \u2014 " + city);
+          else if (name && age) lines.push(name + ", " + age);
+          else if (name && city) lines.push(name + " \u2014 " + city);
+          else if (name) lines.push(name);
+          else if (age && city) lines.push(age + " \u2014 " + city);
+          else if (age) lines.push(age);
+          else if (city) lines.push(city);
+
+          var sections = [
+            ["About me", formEls.fAbout.value.trim()],
+            ["What I\u2019m looking for", formEls.fLooking.value.trim()],
+            ["Red flags", formEls.fRedFlags.value.trim()],
+            ["Dealbreakers", formEls.fDealbreakers.value.trim()],
+            ["Ideal first date", formEls.fFirstDate.value.trim()]
+          ];
+          sections.forEach(function (s) {
+            if (s[1]) lines.push(s[0] + ": " + s[1]);
+          });
+
+          input.value = lines.join("\n\n");
+          updateCount();
+        }
+        formIds.forEach(function (id) {
+          if (formEls[id]) formEls[id].addEventListener("input", composeFromForm);
+        });
+
+        document.getElementById("clearBtn").addEventListener("click", function () {
+          formIds.forEach(function (id) { if (formEls[id]) formEls[id].value = ""; });
+          input.value = "";
+          current = null;
+          chipsEl.innerHTML = "";
+          cardEl.innerHTML = "";
+          promptEl.textContent = "";
+          resultsEl.hidden = true;
+          emptyStateEl.hidden = false;
+          updateCount();
+          input.focus();
+          showToast("Cleared — paste a profile to start over");
+        });
+
+        document.getElementById("generateBtn").addEventListener("click", function () {
+          if (!input.value.trim()) {
+            showToast("Paste your anti-dating profile first, then generate");
+            input.focus();
+            return;
+          }
+          generate();
+          showToast("Character generated");
+          cardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        document.getElementById("randomizeBtn").addEventListener("click", function () {
+          if (!current) {
+            showToast("Paste your anti-dating profile first, then generate");
+            input.focus();
+            return;
+          }
+          current.flavor = rollFlavor(current.parsed);
+          render();
+          showToast("Flavor re-rolled");
+        });
+
+        document.getElementById("copyCardBtn").addEventListener("click", function () {
+          if (current && current.cardText) copyText(current.cardText, "Card text copied");
+        });
+        document.getElementById("copyPromptBtn").addEventListener("click", function () {
+          if (current && current.promptText) copyText(current.promptText, "Image prompt copied");
+        });
+                updateCount();
+      })();
+    </script>
+  </body>
+</html>
